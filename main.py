@@ -7,17 +7,29 @@ import util
 
 from pynput.mouse import Button, Controller
 
+
+# -------------------------------------------------
+# MOUSE SETUP
+# -------------------------------------------------
+
 mouse = Controller()
+
+# Remove PyAutoGUI delay
+pyautogui.PAUSE = 0
 
 # Get screen dimensions
 screen_width, screen_height = pyautogui.size()
 
-# MediaPipe Hands setup
+
+# -------------------------------------------------
+# MEDIAPIPE HANDS SETUP
+# -------------------------------------------------
+
 mpHands = mp.solutions.hands
 
 hands = mpHands.Hands(
     static_image_mode=False,
-    model_complexity=1,
+    model_complexity=0,
     min_detection_confidence=0.7,
     min_tracking_confidence=0.7,
     max_num_hands=1
@@ -25,127 +37,207 @@ hands = mpHands.Hands(
 
 draw = mp.solutions.drawing_utils
 
+
+# -------------------------------------------------
+# ACTION CONTROL
+# -------------------------------------------------
+
 # Prevent gestures such as clicks from firing continuously
 last_action_time = 0
 ACTION_COOLDOWN = 0.6
 
-# Drag state
+
+# -------------------------------------------------
+# DRAG STATE
+# -------------------------------------------------
+
 dragging = False
 
-# Previous position used for scrolling
+
+# -------------------------------------------------
+# SCROLL STATE
+# -------------------------------------------------
+
 previous_scroll_y = None
 
+
+# -------------------------------------------------
+# FIND INDEX FINGER TIP
+# -------------------------------------------------
 
 def find_finger_tip(processed):
     """
     Find the index finger tip from MediaPipe hand landmarks.
     """
+
     if processed.multi_hand_landmarks:
+
         hand_landmarks = processed.multi_hand_landmarks[0]
+
         index_finger_tip = hand_landmarks.landmark[
             mpHands.HandLandmark.INDEX_FINGER_TIP
         ]
+
         return index_finger_tip
 
     return None
 
 
+# -------------------------------------------------
+# MOVE MOUSE
+# -------------------------------------------------
+
 def move_mouse(index_finger_tip):
     """
-    Move the system cursor according to the index finger position.
+    Move the system cursor according to the index
+    finger position with increased sensitivity.
     """
+
     if index_finger_tip is not None:
-        x = int(index_finger_tip.x * screen_width)
 
-        # Limit vertical movement to make cursor control easier
-        y = int(index_finger_tip.y / 2 * screen_height)
+        # Increased cursor sensitivity
+        sensitivity = 1.4
 
-        pyautogui.moveTo(x, y)
+        # Convert MediaPipe coordinates
+        # into more responsive screen coordinates
+        x = (index_finger_tip.x - 0.5) * sensitivity + 0.5
+        y = (index_finger_tip.y - 0.5) * sensitivity + 0.5
 
+        # Keep cursor inside the screen
+        x = max(0.0, min(1.0, x))
+        y = max(0.0, min(1.0, y))
+
+        # Convert to screen coordinates
+        screen_x = int(x * screen_width)
+        screen_y = int(y * screen_height)
+
+        # Move cursor immediately
+        pyautogui.moveTo(screen_x, screen_y)
+
+
+# -------------------------------------------------
+# LEFT CLICK
+# -------------------------------------------------
 
 def is_left_click(landmark_list, thumb_index_dist):
     """
     Detect left-click gesture.
     """
+
     return (
         util.get_angle(
             landmark_list[5],
             landmark_list[6],
             landmark_list[8]
         ) < 50
+
         and
+
         util.get_angle(
             landmark_list[9],
             landmark_list[10],
             landmark_list[12]
         ) > 90
+
         and
+
         thumb_index_dist > 50
     )
 
+
+# -------------------------------------------------
+# RIGHT CLICK
+# -------------------------------------------------
 
 def is_right_click(landmark_list, thumb_index_dist):
     """
     Detect right-click gesture.
     """
+
     return (
         util.get_angle(
             landmark_list[9],
             landmark_list[10],
             landmark_list[12]
         ) < 50
+
         and
+
         util.get_angle(
             landmark_list[5],
             landmark_list[6],
             landmark_list[8]
         ) > 90
+
         and
+
         thumb_index_dist > 50
     )
 
+
+# -------------------------------------------------
+# DOUBLE CLICK
+# -------------------------------------------------
 
 def is_double_click(landmark_list, thumb_index_dist):
     """
     Detect double-click gesture.
     """
+
     return (
         util.get_angle(
             landmark_list[5],
             landmark_list[6],
             landmark_list[8]
         ) < 50
+
         and
+
         util.get_angle(
             landmark_list[9],
             landmark_list[10],
             landmark_list[12]
         ) < 50
+
         and
+
         thumb_index_dist > 50
     )
 
+
+# -------------------------------------------------
+# SCREENSHOT
+# -------------------------------------------------
 
 def is_screenshot(landmark_list, thumb_index_dist):
     """
     Detect screenshot gesture.
     """
+
     return (
         util.get_angle(
             landmark_list[5],
             landmark_list[6],
             landmark_list[8]
         ) < 50
+
         and
+
         util.get_angle(
             landmark_list[9],
             landmark_list[10],
             landmark_list[12]
         ) < 50
+
         and
+
         thumb_index_dist < 50
     )
 
+
+# -------------------------------------------------
+# SCROLL
+# -------------------------------------------------
 
 def is_scroll(landmark_list, thumb_index_dist):
     """
@@ -154,6 +246,7 @@ def is_scroll(landmark_list, thumb_index_dist):
     Both index and middle fingers are extended
     while the thumb is separated from the index finger.
     """
+
     index_angle = util.get_angle(
         landmark_list[5],
         landmark_list[6],
@@ -175,6 +268,10 @@ def is_scroll(landmark_list, thumb_index_dist):
     )
 
 
+# -------------------------------------------------
+# DRAG
+# -------------------------------------------------
+
 def is_drag(landmark_list, thumb_index_dist):
     """
     Detect dragging gesture.
@@ -182,6 +279,7 @@ def is_drag(landmark_list, thumb_index_dist):
     Index finger is extended while the middle finger
     is bent and the thumb is close to the index finger.
     """
+
     index_angle = util.get_angle(
         landmark_list[5],
         landmark_list[6],
@@ -203,10 +301,15 @@ def is_drag(landmark_list, thumb_index_dist):
     )
 
 
+# -------------------------------------------------
+# PERFORM SCROLL
+# -------------------------------------------------
+
 def perform_scroll(index_finger_tip):
     """
     Scroll according to vertical index finger movement.
     """
+
     global previous_scroll_y
 
     if index_finger_tip is None:
@@ -215,10 +318,12 @@ def perform_scroll(index_finger_tip):
     current_y = index_finger_tip.y
 
     if previous_scroll_y is not None:
+
         movement = previous_scroll_y - current_y
 
         # Ignore very small movements
         if abs(movement) > 0.01:
+
             scroll_amount = int(movement * 30)
 
             if scroll_amount != 0:
@@ -227,33 +332,52 @@ def perform_scroll(index_finger_tip):
     previous_scroll_y = current_y
 
 
+# -------------------------------------------------
+# RESET SCROLL
+# -------------------------------------------------
+
 def reset_scroll():
     """
     Reset the previous scroll position.
     """
+
     global previous_scroll_y
+
     previous_scroll_y = None
 
 
+# -------------------------------------------------
+# ACTION COOLDOWN
+# -------------------------------------------------
+
 def can_perform_action():
     """
-    Check whether enough time has passed since the last action.
+    Check whether enough time has passed since
+    the last action.
     """
+
     global last_action_time
 
     current_time = time.time()
 
     if current_time - last_action_time >= ACTION_COOLDOWN:
+
         last_action_time = current_time
+
         return True
 
     return False
 
 
+# -------------------------------------------------
+# TAKE SCREENSHOT
+# -------------------------------------------------
+
 def take_screenshot():
     """
     Capture and save a screenshot with a random filename.
     """
+
     image = pyautogui.screenshot()
 
     label = random.randint(1, 100000)
@@ -265,14 +389,21 @@ def take_screenshot():
     return filename
 
 
+# -------------------------------------------------
+# GESTURE DETECTION
+# -------------------------------------------------
+
 def detect_gesture(frame, landmark_list, processed):
     """
     Detect the current hand gesture and perform the
     corresponding mouse action.
     """
+
     global dragging
 
+    # No hand detected
     if len(landmark_list) < 21:
+
         reset_scroll()
 
         if dragging:
@@ -281,21 +412,29 @@ def detect_gesture(frame, landmark_list, processed):
 
         return
 
+
+    # Get index finger tip
     index_finger_tip = find_finger_tip(processed)
 
+
+    # Distance between thumb and index finger
     thumb_index_dist = util.get_distance(
         [landmark_list[4], landmark_list[5]]
     )
 
+
     # -------------------------------------------------
     # DRAG
     # -------------------------------------------------
+
     if is_drag(landmark_list, thumb_index_dist):
 
         reset_scroll()
 
         if not dragging:
+
             mouse.press(Button.left)
+
             dragging = True
 
         move_mouse(index_finger_tip)
@@ -312,14 +451,19 @@ def detect_gesture(frame, landmark_list, processed):
 
         return
 
+
     # If dragging gesture has ended, release mouse
     if dragging:
+
         mouse.release(Button.left)
+
         dragging = False
+
 
     # -------------------------------------------------
     # SCROLL
     # -------------------------------------------------
+
     if is_scroll(landmark_list, thumb_index_dist):
 
         perform_scroll(index_finger_tip)
@@ -336,16 +480,20 @@ def detect_gesture(frame, landmark_list, processed):
 
         return
 
+
     reset_scroll()
+
 
     # -------------------------------------------------
     # CURSOR MOVEMENT
     # -------------------------------------------------
+
     index_angle = util.get_angle(
         landmark_list[5],
         landmark_list[6],
         landmark_list[8]
     )
+
 
     if thumb_index_dist < 50 and index_angle > 90:
 
@@ -361,14 +509,17 @@ def detect_gesture(frame, landmark_list, processed):
             2
         )
 
+
     # -------------------------------------------------
     # LEFT CLICK
     # -------------------------------------------------
+
     elif is_left_click(landmark_list, thumb_index_dist):
 
         if can_perform_action():
 
             mouse.press(Button.left)
+
             mouse.release(Button.left)
 
         cv2.putText(
@@ -381,14 +532,17 @@ def detect_gesture(frame, landmark_list, processed):
             2
         )
 
+
     # -------------------------------------------------
     # RIGHT CLICK
     # -------------------------------------------------
+
     elif is_right_click(landmark_list, thumb_index_dist):
 
         if can_perform_action():
 
             mouse.press(Button.right)
+
             mouse.release(Button.right)
 
         cv2.putText(
@@ -401,9 +555,11 @@ def detect_gesture(frame, landmark_list, processed):
             2
         )
 
+
     # -------------------------------------------------
     # DOUBLE CLICK
     # -------------------------------------------------
+
     elif is_double_click(landmark_list, thumb_index_dist):
 
         if can_perform_action():
@@ -420,9 +576,11 @@ def detect_gesture(frame, landmark_list, processed):
             2
         )
 
+
     # -------------------------------------------------
     # SCREENSHOT
     # -------------------------------------------------
+
     elif is_screenshot(landmark_list, thumb_index_dist):
 
         if can_perform_action():
@@ -439,7 +597,9 @@ def detect_gesture(frame, landmark_list, processed):
                 2
             )
 
+
     else:
+
         cv2.putText(
             frame,
             "Gesture not recognized",
@@ -451,16 +611,24 @@ def detect_gesture(frame, landmark_list, processed):
         )
 
 
+# -------------------------------------------------
+# MAIN FUNCTION
+# -------------------------------------------------
+
 def main():
 
     cap = cv2.VideoCapture(0)
 
     if not cap.isOpened():
+
         print("Error: Could not access the webcam.")
+
         return
+
 
     print("Virtual Mouse started.")
     print("Press 'q' to quit.")
+
 
     try:
 
@@ -469,11 +637,15 @@ def main():
             ret, frame = cap.read()
 
             if not ret:
+
                 print("Error: Could not read webcam frame.")
+
                 break
+
 
             # Mirror the webcam
             frame = cv2.flip(frame, 1)
+
 
             # Convert BGR to RGB for MediaPipe
             frameRGB = cv2.cvtColor(
@@ -481,10 +653,13 @@ def main():
                 cv2.COLOR_BGR2RGB
             )
 
+
             # Process hand
             processed = hands.process(frameRGB)
 
+
             landmark_list = []
+
 
             # Draw hand landmarks
             if processed.multi_hand_landmarks:
@@ -497,11 +672,13 @@ def main():
                     mpHands.HAND_CONNECTIONS
                 )
 
+
                 for lm in hand_landmarks.landmark:
 
                     landmark_list.append(
                         (lm.x, lm.y)
                     )
+
 
             # Detect gesture
             detect_gesture(
@@ -510,20 +687,26 @@ def main():
                 processed
             )
 
+
             # Display webcam
             cv2.imshow(
                 "Gesture Controlled Virtual Mouse",
                 frame
             )
 
+
             # Press Q to exit
             if cv2.waitKey(1) & 0xFF == ord("q"):
+
                 break
+
 
     finally:
 
         if dragging:
+
             mouse.release(Button.left)
+
 
         cap.release()
 
@@ -532,5 +715,10 @@ def main():
         print("Virtual Mouse stopped.")
 
 
+# -------------------------------------------------
+# PROGRAM START
+# -------------------------------------------------
+
 if __name__ == "__main__":
+
     main()
