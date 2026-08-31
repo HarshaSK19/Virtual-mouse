@@ -1,8 +1,22 @@
 # 🖱️ Gesture Controlled Virtual Mouse
 
-A real-time computer vision project that allows users to control the mouse using hand gestures through a webcam.
+A real-time computer vision application that enables **touchless computer interaction** using hand gestures captured through a webcam.
 
 The system uses **MediaPipe** for hand landmark detection, **OpenCV** for real-time video processing, and **PyAutoGUI/Pynput** for system-level mouse control.
+
+---
+
+## ✨ Key Highlights
+
+- 🖐️ Real-time hand tracking using MediaPipe
+- 🖱️ Gesture-based cursor movement
+- 👆 Left click, right click, and double click
+- 📜 Scroll control
+- 🤏 Drag-and-drop interaction
+- 📸 Gesture-based screenshot capture
+- 🎥 Webcam-based real-time interaction
+- ⚡ Real-time gesture recognition and system control
+- 📊 Gesture accuracy evaluation support
 
 ---
 
@@ -10,23 +24,34 @@ The system uses **MediaPipe** for hand landmark detection, **OpenCV** for real-t
 
 ![Gesture Controlled Virtual Mouse](virtual-mouse-demo.png)
 
-The system uses hand gestures to control the computer cursor and perform common mouse operations without physical contact.
+The application uses hand gestures to control the computer cursor and perform common mouse operations without physical contact.
 
 ---
 
 ## 🚀 Features
 
-- 🖐️ Real-time hand detection and tracking
-- 🖱️ Gesture-based cursor movement
-- 👆 Left click
-- 👉 Right click
-- ✌️ Double click
-- 📜 Scroll control
-- 🤏 Drag and drop
-- 📸 Screenshot capture
-- 🎥 Webcam-based interaction
-- 💻 Contactless computer control
-- ⚡ Responsive cursor movement
+### 🖱️ Mouse Control
+
+- Move the cursor using the index finger
+- Perform left clicks using hand gestures
+- Perform right clicks using hand gestures
+- Perform double clicks
+- Scroll vertically
+- Drag and drop objects
+
+### 🖥️ System Interaction
+
+- Capture screenshots using a hand gesture
+- Control the computer without a physical mouse
+- Real-time webcam-based interaction
+
+### 👁️ Computer Vision
+
+- Real-time hand detection
+- 21-point hand landmark tracking
+- Finger position and angle analysis
+- Distance-based gesture recognition
+- Coordinate mapping between camera and screen
 
 ---
 
@@ -35,12 +60,11 @@ The system uses hand gestures to control the computer cursor and perform common 
 | Technology | Purpose |
 |---|---|
 | 🐍 Python | Core programming language |
-| 👁️ OpenCV | Webcam input and image processing |
-| ✋ MediaPipe | Hand landmark detection |
+| 👁️ OpenCV | Webcam input and real-time image processing |
+| ✋ MediaPipe | Hand detection and 21-landmark tracking |
 | 🖱️ PyAutoGUI | Cursor and screenshot automation |
 | 🖱️ Pynput | Mouse click and drag control |
-| 🔢 NumPy | Mathematical calculations |
-| 💻 VS Code | Development environment |
+| 🔢 NumPy | Numerical and mathematical calculations |
 
 ---
 
@@ -48,33 +72,31 @@ The system uses hand gestures to control the computer cursor and perform common 
 
 The system follows a real-time computer vision pipeline:
 
-```text
-Webcam
-   ↓
-Capture Video Frame
-   ↓
-OpenCV Processing
-   ↓
-MediaPipe Hand Detection
-   ↓
-21 Hand Landmarks
-   ↓
-Gesture Analysis
-   ↓
-Gesture Recognition
-   ↓
-Mouse / System Action
-```
+**📷 Webcam**  
+          ↓  
+**🎞️ Frame Capture**  
+           ↓  
+**👁️ OpenCV Processing**  
+           ↓  
+**✋ MediaPipe Hand Detection**  
+           ↓  
+**📍 21 Hand Landmarks**  
+           ↓  
+**🧠 Gesture Analysis**  
+           ↓  
+**🎯 Gesture Recognition**  
+           ↓  
+**🖱️ Mouse / System Action**
 
-### 🔄 Process
+### 🔄 Processing Pipeline
 
-1. The webcam captures the user's hand movement.
-2. OpenCV processes each video frame.
-3. MediaPipe detects the hand and identifies 21 hand landmarks.
-4. Finger positions, angles, and distances are analyzed.
-5. The system identifies the corresponding gesture.
-6. The recognized gesture is mapped to a computer action.
-7. PyAutoGUI or Pynput performs the required system-level action.
+1. The webcam continuously captures video frames.
+2. OpenCV processes the incoming frames.
+3. MediaPipe detects the hand and identifies **21 hand landmarks**.
+4. Finger positions, angles, and distances between landmarks are analyzed.
+5. The system determines which gesture is being performed.
+6. The recognized gesture is mapped to a specific computer action.
+7. PyAutoGUI or Pynput performs the corresponding system-level action.
 
 ---
 
@@ -82,34 +104,43 @@ Mouse / System Action
 
 | Gesture | Action |
 |---|---|
-| ☝️ Index finger | Move cursor |
-| 👆 Index + bent middle finger | Left click |
-| 👉 Middle + bent index finger | Right click |
+| ☝️ Index finger extended | Move cursor |
+| 👆 Index finger + middle finger bent | Left click |
+| 👉 Middle finger + index finger bent | Right click |
 | ✌️ Two fingers bent | Double click |
 | 🖐️ Index + middle fingers extended | Scroll |
-| 🤏 Index extended + middle bent + thumb close | Drag |
+| 🤏 Index finger extended + middle finger bent + thumb close | Drag and drop |
 | 🤌 Both fingers bent + thumb close | Screenshot |
 
-Gesture recognition is based on finger angles and the distance between hand landmarks.
+Gesture recognition is based on **finger angles, landmark positions, and distances between hand landmarks**.
 
 ---
 
 ## 📁 Project Structure
 
-```text
-Virtual-mouse/
-│
-├── main.py
-├── util.py
-├── evaluate_accuracy.py
-├── requirements.txt
-├── README.md
-├── FINAL REPORT.pdf
-├── final.pptx
-├── final ppttt.pptx
-├── my_screenshot_128.png
-└── .gitignore
-```
+**Virtual-mouse/**
+
+    ├── main.py
+    ├── util.py
+    ├── evaluate_accuracy.py
+    ├── requirements.txt
+    ├── README.md
+    ├── FINAL REPORT.pdf
+    ├── virtual-mouse-demo.png
+    └── .gitignore
+
+### 📄 File Description
+
+| File | Description |
+|---|---|
+| `main.py` | Main application containing the virtual mouse logic |
+| `util.py` | Utility functions used by the application |
+| `evaluate_accuracy.py` | Gesture prediction evaluation script |
+| `requirements.txt` | Required Python dependencies |
+| `README.md` | Project documentation |
+| `FINAL REPORT.pdf` | Project documentation and report |
+| `virtual-mouse-demo.png` | Project demonstration image |
+| `.gitignore` | Prevents generated and unwanted files from being committed |
 
 ---
 
@@ -126,63 +157,49 @@ Before running the project, make sure you have:
 
 ## 📦 Installation
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
-```bash
-git clone https://github.com/HarshaSK19/Virtual-mouse.git
-```
+    git clone https://github.com/HarshaSK19/Virtual-mouse.git
 
-### 2. Navigate into the project
+### 2. Navigate to the Project Directory
 
-```bash
-cd Virtual-mouse
-```
+    cd Virtual-mouse
 
-### 3. Install dependencies
+### 3. Install Dependencies
 
-```bash
-pip install -r requirements.txt
-```
+    pip install -r requirements.txt
 
 ---
 
 ## ▶️ Run the Project
 
-Start the virtual mouse using:
+Start the virtual mouse application using:
 
-```bash
-python main.py
-```
+    python main.py
 
-A webcam window will open and the system will begin detecting hand gestures.
+A webcam window will open and the application will begin detecting hand gestures.
 
 To stop the application, press:
 
-```text
-Q
-```
+    Q
 
 ---
 
-## 📸 Screenshot Capture
+## 📸 Gesture-Based Screenshot Capture
 
 The project includes a gesture-based screenshot feature.
 
-When the screenshot gesture is detected, the program captures the current screen and saves the image as a PNG file.
+When the designated screenshot gesture is detected, the application captures the current screen and saves the screenshot as a PNG file.
 
-```
-
-Generated screenshots are ignored by Git using the project's `.gitignore` configuration.
+Generated screenshots are excluded from Git using the project's `.gitignore` configuration.
 
 ---
 
-## 📊 Accuracy Evaluation
+## 📊 Gesture Accuracy Evaluation
 
 The project includes an evaluation script:
 
-```text
-evaluate_accuracy.py
-```
+    evaluate_accuracy.py
 
 The script is designed to calculate:
 
@@ -195,41 +212,61 @@ The script is designed to calculate:
 
 Run the evaluation using:
 
-```bash
-python evaluate_accuracy.py
-```
+    python evaluate_accuracy.py
 
-The evaluation script expects a CSV file containing predicted and true gesture labels.
+The evaluation script expects a CSV file containing the **predicted gesture labels and corresponding true labels**.
 
-Accuracy values are not listed because the project does not currently have a finalized benchmark dataset.
+> **Note:** Accuracy results are not currently reported because the project does not yet have a finalized benchmark dataset.
 
 ---
 
-## 🔍 Computer Vision Concepts
+## ⚠️ Limitations
 
-This project demonstrates practical applications of:
+The current implementation has some practical limitations:
 
-- Hand landmark detection
-- Real-time computer vision
-- Gesture recognition
-- Coordinate mapping
-- Distance calculation
-- Angle calculation
-- Human-computer interaction
-- System automation
+- Performance depends on webcam quality.
+- Poor lighting can affect hand detection.
+- The hand should remain visible within the camera frame.
+- Gesture recognition can vary depending on hand position and orientation.
+- Rapid hand movements may occasionally affect recognition.
+- The current implementation is primarily designed for single-hand interaction.
 
 ---
 
-## 🎯 Applications
+## 🛠️ Troubleshooting
 
-Gesture-controlled interfaces can be useful for:
+### 📷 Webcam Not Detected
+
+- Make sure the webcam is connected and working.
+- Close other applications that may be using the camera.
+- Check camera permissions for Python or your operating system.
+
+### ✋ Gestures Not Recognized
+
+- Ensure your hand is clearly visible.
+- Use adequate lighting.
+- Keep your hand within the camera frame.
+- Avoid excessive background clutter.
+- Try maintaining a consistent distance from the webcam.
+
+### 🖱️ Cursor Movement Is Unstable
+
+- Keep your hand movements smooth.
+- Maintain a reasonable distance from the camera.
+- Ensure sufficient lighting for reliable landmark detection.
+
+---
+
+## 💡 Practical Applications
+
+Gesture-controlled interfaces can be useful in areas such as:
 
 - 💻 Touchless computer interaction
 - ♿ Assistive technology
 - 🎮 Interactive systems
 - 🖥️ Contactless interfaces
-- 🔗 Human-computer interaction research
-- 🏠 Smart environments
+- 🔬 Human-computer interaction research
+- 🏠 Smart environment interfaces
 
 ---
 
@@ -237,22 +274,22 @@ Gesture-controlled interfaces can be useful for:
 
 Possible future improvements include:
 
-- 🖐️ Support for multiple hands
-- 🎯 Improved cursor stabilization
+- 🖐️ Multi-hand gesture support
+- 🎯 Improved cursor stabilization and smoothing
 - 🧠 Machine-learning-based gesture classification
-- ⚙️ Customizable gestures
-- 📈 Real-time performance metrics
+- ⚙️ Customizable gesture-to-action mapping
+- 📈 Real-time performance monitoring
 - 🖥️ GUI-based configuration
 - 🔊 Voice and gesture hybrid control
-- 📱 Integration with other smart-device interfaces
+- 📱 Integration with smart-device interfaces
 
 ---
 
 ## 👨‍💻 Author
 
-**Harsha SK**
+### Harsha SK
 
-AI/ML & Data Science Enthusiast | RAG | Python
+**AI/ML & Data Science Enthusiast**
 
 Interested in building practical solutions using:
 
@@ -265,7 +302,7 @@ Interested in building practical solutions using:
 
 ---
 
-## ⭐ If You Like This Project
+## ⭐ Support
 
 If you find this project useful or interesting, consider giving the repository a ⭐ on GitHub.
 
