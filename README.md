@@ -162,10 +162,6 @@ The project includes a gesture-based screenshot feature.
 
 When the screenshot gesture is detected, the program captures the current screen and saves the image as a PNG file.
 
-Example:
-
-```text
-my_screenshot_128.png
 ```
 
 Generated screenshots are ignored by Git using the project's `.gitignore` configuration.
