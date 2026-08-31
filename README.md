@@ -6,6 +6,14 @@ The system uses **MediaPipe** for hand landmark detection, **OpenCV** for real-t
 
 ---
 
+## 📸 Demo
+
+![Gesture Controlled Virtual Mouse](virtual-mouse-demo.png)
+
+The system uses hand gestures to control the computer cursor and perform common mouse operations without physical contact.
+
+---
+
 ## 🚀 Features
 
 - 🖐️ Real-time hand detection and tracking
